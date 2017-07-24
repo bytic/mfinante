@@ -2,6 +2,7 @@
 
 namespace ByTIC\MFinante;
 
+use ByTIC\MFinante\Parsers\AbstractParser;
 use ByTIC\MFinante\Scrapers\CompanyPage;
 
 /**
@@ -12,7 +13,7 @@ class MFinante
 {
     /**
      * @param $cif
-     * @return bool
+     * @return AbstractParser
      */
     public static function cif(int $cif)
     {
