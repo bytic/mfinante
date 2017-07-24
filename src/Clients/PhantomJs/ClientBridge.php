@@ -2,10 +2,10 @@
 
 namespace ByTIC\MFinante\Clients\PhantomJs;
 
-use JonnyW\PhantomJs\Client as PhantomJsBaseClient;
 use GuzzleHttp\ClientInterface as GuzzleClientInterface;
+use JonnyW\PhantomJs\Client as PhantomJsBaseClient;
+use PhantomInstaller\PhantomBinary;
 use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class PhantomJsClientBridge
@@ -79,13 +79,7 @@ class ClientBridge implements GuzzleClientInterface
     {
         if ($this->phantomJsClient === null) {
             $this->phantomJsClient = PhantomJsBaseClient::getInstance();
-
-            $uname = strtolower(php_uname());
-
-            if (strpos($uname, 'win') !== false) {
-                $this->phantomJsClient->getEngine()->setPath(dirname(dirname(dirname(__DIR__))) . '/bin/phantomjs.exe');
-
-            }
+            $this->phantomJsClient->getEngine()->setPath(PhantomBinary::getBin());
         }
         return $this->phantomJsClient;
     }

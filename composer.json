@@ -13,9 +13,6 @@
       "ByTIC\\MFinante\\": "src/"
     }
   },
-  "config": {
-    "bin-dir": "bin"
-  },
   "require": {
     "php": "^7.0",
     "fabpot/goutte": "^3.2",
