@@ -30,4 +30,5 @@ return [
     'tax_oil' => 'NU',
     'tax_gambling' => 'NU',
     'contribution_medical' => 'NU',
+    'balance_sheets' => [2014, 2015, 2016],
 ];
