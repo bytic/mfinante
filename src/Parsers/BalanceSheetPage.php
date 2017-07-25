@@ -2,12 +2,15 @@
 
 namespace ByTIC\MFinante\Parsers;
 
-use ByTIC\MFinante\Models\Company;
+use ByTIC\MFinante\Models\BalanceSheet;
+use ByTIC\MFinante\Scrapers\BalanceSheetPage as Scraper;
 use DOMElement;
 
 /**
  * Class BalanceSheetPage
  * @package ByTIC\MFinante\Scrapers
+ *
+ * @method Scraper getScraper()
  */
 class BalanceSheetPage extends AbstractParser
 {
@@ -17,7 +20,7 @@ class BalanceSheetPage extends AbstractParser
      */
     public function getModelClassName()
     {
-        return Company::class;
+        return BalanceSheet::class;
     }
 
     /**
@@ -26,19 +29,8 @@ class BalanceSheetPage extends AbstractParser
     protected function generateContent()
     {
         $return = [];
-        $return['cif'] = $this->parseCif();
         $return = array_merge($return, $this->parseTable());
-        $return['balance_sheets'] = $this->parseBalanceSheetsYears();
         return $return;
-    }
-
-    /**
-     * @return string
-     */
-    protected function parseCif()
-    {
-        $html = $this->getCrawler()->filter('#main > div[align="center"] > b')->html();
-        return trim(str_replace('AGENTUL ECONOMIC CU CODUL UNIC DE IDENTIFICARE', '', $html));
     }
 
     /**
@@ -77,7 +69,7 @@ class BalanceSheetPage extends AbstractParser
         $value = preg_replace('/\s+/', ' ', $value);
         $value = trim($value);
 
-        $labels = self::getLabelMaps();
+        $labels = self::getLabelMaps($this->getScraper()->getYear());
 
         $labelFind = array_search($label, $labels);
         if ($labelFind) {
@@ -87,56 +79,77 @@ class BalanceSheetPage extends AbstractParser
     }
 
     /**
+     * @param $year
      * @return array
      */
-    public static function getLabelMaps()
+    public static function getLabelMaps($year)
     {
-        return [
-            'name' => 'Denumire platitor',
-            'address' => 'Adresa',
-            'county' => 'Judetul',
-            'trade_register_code' => 'Numar de inmatriculare la Registrul Comertului',
-            'authorization_code' => 'Act autorizare',
-            'postal_code' => 'Codul postal',
-            'phone' => 'Telefon',
-            'fax' => 'Fax',
-            'state' => 'Stare societate',
-            'observations' => 'Observatii privind societatea comerciala',
-            'date_last_statement' => 'Data inregistrarii ultimei declaratii',
-            'date_last_processing' => 'Data ultimei prelucrari',
-            'tax_profit' => 'Impozit pe profit (data luarii in evidenta)',
-            'tax_income' => 'Impozit pe veniturile microintreprinderilor (data luarii in evidenta)',
-            'tax_excise' => 'Accize (data luarii in evidenta)',
-            'tax_vat' => 'Taxa pe valoarea adaugata (data luarii in evidenta)',
-            'contribution_social' => 'Contributia de asigurari sociale (data luarii in evidenta)',
-            'contribution_insurance' => 'Contributia de asigurare pentru accidente de munca si boli profesionale '
-                . 'datorate de angajator (data luarii in evidenta)',
-            'contribution_unemployment' => 'Contributia de asigurari pentru somaj (data luarii in evidenta)',
-            'contribution_debts_fund' => 'Contributia angajatorilor pentru Fondul de garantare pentru plata creantelor'
-                . ' sociale (data luarii in evidenta)',
-            'contribution_medical' => 'Contributia pentru asigurari de sanatate (data luarii in evidenta)',
-            'contribution_leaves' => 'Contributii pentru concedii si indemnizatii de la persoane juridice sau fizice'
-                . ' (data luarii in evidenta)',
-            'tax_gambling' => 'Taxa jocuri de noroc (data luarii in evidenta)',
-            'tax_salaries' => 'Impozit pe veniturile din salarii si asimilate salariilor (data luarii in evidenta)',
-            'tax_buildings' => 'Impozit pe constructii(data luarii in evidenta)',
-            'tax_oil_gas' => 'Impozit la titeiul si la gazele naturale din productia interna (data luarii in evidenta)',
-            'tax_mining' => 'Redevente miniere/Venituri din concesiuni si inchirieri (data luarii in evidenta)',
-            'tax_oil' => 'Redevente petroliere (data luarii in evidenta)',
-        ];
-    }
+        $return = [
+            'fixed_assets' => 'A. Active imobilizate - total',
+            'current_assets' => 'B. Active circulante - total',
+            'prepayments' => 'C. Cheltuieli in avans',
+            'debts_year' => 'D. Datorii ce trebuie platite intr-o perioada de pana la un an',
+            'net_current_assets' => 'E. Active circulante nete, respectiv datorii curente nete',
+            'total_assets' => 'F. Total active minus datorii curente',
+            'debts_year_plus' => 'G. Datorii ce trebuie platite intr-o perioada mai mare de un an',
+            'provisions' => 'H. Provizioane',
+            'income_advance' => 'I. Venituri in avans',
+            'equity' => 'J. Capitaluri proprii - total',
+            'funds_non_profit' => 'Fonduri privind activitatile fara scop patrimonial',
+            'total_capital' => 'Capitaluri Total',
 
-    /**
-     * @return array
-     */
-    protected function parseBalanceSheetsYears()
-    {
-        $select = $this->getCrawler()->filter('form[name="codfiscalForm"] > select')->first();
-        $options = $select->children();
-        $years = [];
-        foreach ($options as $option) {
-            $years[] = $option->nodeValue;
+            'caen_non_profit' => 'CAEN privind activitatile fara scop patrimonial',
+            'employees_non_profit' => 'Efectivul de personal privind activitatea fara scop patrimonial',
+            'caen_economic' => 'CAEN privind activitatile economice sau financiare',
+            'employees_economic' => 'Efectivul de personal privind activitatile economice sau financiare',
+        ];
+
+        $expenses = [
+            'non_profit' => 'fara scop patrimonial',
+            'special' => 'cu destinatie speciala',
+            'economic' => 'economice',
+            'total' => 'totale',
+        ];
+        $indicators = [
+            'revenues' => 'Venituri',
+            'expenses' => 'Cheltuieli',
+            'surplus' => 'Excedent',
+            'deficit' => 'Deficit',
+        ];
+
+        foreach ($expenses as $expenseKey => $expenseLabel) {
+            if ($expenseKey == 'economic') {
+                array_pop($indicators);
+                array_pop($indicators);
+                $indicators['profit'] = 'Profit';
+                $indicators['loss'] = 'Pierdere';
+            }
+            foreach ($indicators as $indicatorKey => $indicatorLabel) {
+                if ($expenseKey == 'total') {
+                    if (in_array($indicatorKey, ['profit', 'loss'])) {
+                        $indicatorLabel = ($indicatorKey == 'profit') ? 'Excedent/Profit' : 'Deficit/Pierdere';
+                        $return['' . $indicatorKey . '_' . $expenseKey . '_provisions']
+                            = $indicatorLabel . ' - prevederi anuale';
+                        $return['' . $indicatorKey . '_' . $expenseKey . '_endyear']
+                            = $indicatorLabel . ' - la 31.12.' . $year;
+                    } else {
+                        $return['' . $indicatorKey . '_' . $expenseKey . '_endyear']
+                            = $indicatorLabel . ' ' . $expenseLabel . ' - la 31.12.' . $year;
+
+                        $return['' . $indicatorKey . '_' . $expenseKey . '_provisions']
+                            = $indicatorLabel . ' ' . $expenseLabel . ' - prevederi anuale';
+                    }
+                } else {
+                    $linkAttribute = $indicatorKey == 'expenses' ? 'privind' : 'din';
+                    $return['' . $indicatorKey . '_' . $expenseKey . '_provisions']
+                        = $indicatorLabel . ' ' . $linkAttribute . ' activitatile ' . $expenseLabel . ' - prevederi anuale';
+
+                    $return['' . $indicatorKey . '_' . $expenseKey . '_endyear']
+                        = $indicatorLabel . ' ' . $linkAttribute . ' activitatile ' . $expenseLabel . ' - la 31.12.' . $year;
+                }
+            }
         }
-        return $years;
+
+        return $return;
     }
 }
