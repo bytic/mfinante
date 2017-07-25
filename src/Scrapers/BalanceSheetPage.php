@@ -5,10 +5,13 @@ namespace ByTIC\MFinante\Scrapers;
 use ByTIC\MFinante\Exception\InvalidArgumentException;
 use ByTIC\MFinante\Exception\InvalidCifException;
 use ByTIC\MFinante\Helper;
+use ByTIC\MFinante\Parsers\BalanceSheetPage as Parser;
 
 /**
  * Class BalanceSheetPage
  * @package ByTIC\MFinante\Scrapers
+ *
+ * @method Parser execute()
  */
 class BalanceSheetPage extends AbstractScraper
 {
