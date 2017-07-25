@@ -4,8 +4,8 @@ namespace ByTIC\MFinante\Tests\Parsers;
 
 use ByTIC\MFinante\Parsers\CompanyPage as CompanyPageParser;
 use ByTIC\MFinante\Scrapers\CompanyPage as CompanyPageScraper;
-use Symfony\Component\DomCrawler\Crawler;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Class CompanyPageTest

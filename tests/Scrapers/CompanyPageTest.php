@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Solomon
- * Date: 7/24/2017
- * Time: 9:54 AM
- */
 
 namespace ByTIC\MFinante\Tests\Scrapers;
 
