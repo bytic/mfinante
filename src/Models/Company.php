@@ -182,4 +182,10 @@ class Company
      * @var string
      */
     protected $tax_oil;
+
+    /**
+     * Array of balance sheets available years
+     * @var array
+     */
+    protected $balance_sheets = [];
 }

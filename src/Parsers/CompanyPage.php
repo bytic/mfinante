@@ -20,6 +20,7 @@ class CompanyPage extends AbstractParser
         $return = [];
         $return['cif'] = $this->parseCif();
         $return = array_merge($return, $this->parseTable());
+        $return['balance_sheets'] = $this->parseBalanceSheetsYears();
         return $return;
     }
 
@@ -88,6 +89,20 @@ class CompanyPage extends AbstractParser
     /**
      * @return array
      */
+    protected function parseBalanceSheetsYears()
+    {
+        $select = $this->getCrawler()->filter('form[name="codfiscalForm"] > select')->first();
+        $options = $select->children();
+        $years = [];
+        foreach ($options as $option) {
+            $years[] = $option->nodeValue;
+        }
+        return $years;
+    }
+
+    /**
+     * @return array
+     */
     public static function getLabelMaps()
     {
         return [
@@ -108,11 +123,14 @@ class CompanyPage extends AbstractParser
             'tax_excise' => 'Accize (data luarii in evidenta)',
             'tax_vat' => 'Taxa pe valoarea adaugata (data luarii in evidenta)',
             'contribution_social' => 'Contributia de asigurari sociale (data luarii in evidenta)',
-            'contribution_insurance' => 'Contributia de asigurare pentru accidente de munca si boli profesionale datorate de angajator (data luarii in evidenta)',
+            'contribution_insurance' => 'Contributia de asigurare pentru accidente de munca si boli profesionale '
+                . 'datorate de angajator (data luarii in evidenta)',
             'contribution_unemployment' => 'Contributia de asigurari pentru somaj (data luarii in evidenta)',
-            'contribution_debts_fund' => 'Contributia angajatorilor pentru Fondul de garantare pentru plata creantelor sociale (data luarii in evidenta)',
+            'contribution_debts_fund' => 'Contributia angajatorilor pentru Fondul de garantare pentru plata creantelor'
+                . ' sociale (data luarii in evidenta)',
             'contribution_medical' => 'Contributia pentru asigurari de sanatate (data luarii in evidenta)',
-            'contribution_leaves' => 'Contributii pentru concedii si indemnizatii de la persoane juridice sau fizice (data luarii in evidenta)',
+            'contribution_leaves' => 'Contributii pentru concedii si indemnizatii de la persoane juridice sau fizice'
+                . ' (data luarii in evidenta)',
             'tax_gambling' => 'Taxa jocuri de noroc (data luarii in evidenta)',
             'tax_salaries' => 'Impozit pe veniturile din salarii si asimilate salariilor (data luarii in evidenta)',
             'tax_buildings' => 'Impozit pe constructii(data luarii in evidenta)',

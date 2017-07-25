@@ -2,12 +2,15 @@
 
 namespace ByTIC\MFinante\Scrapers;
 
-use ByTIC\MFinante\Helper;
 use ByTIC\MFinante\Exception\InvalidCifException;
+use ByTIC\MFinante\Helper;
+use ByTIC\MFinante\Parsers\CompanyPage as Parser;
 
 /**
  * Class CompanyPage
  * @package ByTIC\MFinante\Scrapers
+ *
+ * @method Parser execute()
  */
 class CompanyPage extends AbstractScraper
 {
