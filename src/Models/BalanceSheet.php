@@ -8,5 +8,4 @@ namespace ByTIC\MFinante\Models;
  */
 class BalanceSheet
 {
-
 }
