@@ -27,6 +27,7 @@ class BalanceSheetPage extends AbstractScraper
 
     /**
      * CompanyPage constructor.
+     *
      * @param int $cif
      * @param int $year
      */
@@ -50,14 +51,19 @@ class BalanceSheetPage extends AbstractScraper
                 'Year [' . $this->getYear() . '] is invalid'
             );
         }
+
+        $params = [
+            'an'            => 'WEB_ONG_AN' . $year,
+            'cod'           => $this->getCif(),
+            'captcha'       => 'null',
+            'method.bilant' => 'VIZUALIZARE'
+        ];
+
         $crawler = $this->getClient()->request(
             'GET',
-            'http://www.mfinante.gov.ro/infocodfiscal.html?' .
-            'an=WEB_ONG_AN' . $year
-            . '&cod=' . $this->getCif()
-            . '&captcha=null'
-            . '&method.bilant=VIZUALIZARE'
+            'http://www.mfinante.ro/infocodfiscal.html?' . http_build_query($params)
         );
+
         return $crawler;
     }
 

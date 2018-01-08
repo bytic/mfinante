@@ -54,7 +54,7 @@ class CompanyPage extends AbstractScraper
         }
         $crawler = $this->getClient()->request(
             'GET',
-            'http://www.mfinante.gov.ro/infocodfiscal.html?cod=' . $this->getCif()
+            'http://www.mfinante.ro/infocodfiscal.html?cod=' . $this->getCif()
         );
         return $crawler;
     }

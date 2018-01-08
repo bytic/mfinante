@@ -57,18 +57,18 @@ abstract class AbstractParser
     public function isValidContent()
     {
         if ($this->isValidContent == null) {
-            $this->doValidation();
-            $this->isValidContent = true;
+            $this->isValidContent = $this->doValidation();
         }
 
         return $this->isValidContent;
     }
 
     /**
-     * @return void
+     * @return boolean
      */
     protected function doValidation()
     {
+        return true;
     }
 
     /**

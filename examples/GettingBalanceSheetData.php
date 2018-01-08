@@ -9,4 +9,4 @@ $year       = 2016;
 
 $balanceSheetData = MFinante::balanceSheet($companyCif, $year);
 
-var_dump($balanceSheetData);
+var_dump($balanceSheetData->getContent());
