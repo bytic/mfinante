@@ -18,18 +18,11 @@ class ClientBridge implements GuzzleClientInterface
     /**
      * @inheritdoc
      */
-    public function request($method, $uri = '', array $options = [])
+    public function request($method, $uri = '', array $parameters = [])
     {
-        $client = $this->getPhantomJsClient();
+        $client  = $this->getPhantomJsClient();
+        $request = $this->createRequest($client, $method, $uri, $parameters);
 
-        /**
-         * @see \JonnyW\PhantomJs\Http\Request
-         **/
-        $request = $client->getMessageFactory()->createRequest($uri, $method);
-        $request->addHeader(
-            'User-Agent',
-            'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0'
-        );
         /** IMPORTANT - the delay is necessary to make sure the javascript is all loaded */
         $request->setDelay(12);
 
@@ -73,6 +66,37 @@ class ClientBridge implements GuzzleClientInterface
     }
 
     /**
+     * @param PhantomJsBaseClient $client
+     * @param $method
+     * @param string $uri
+     * @param array $parameters
+     *
+     * @return \JonnyW\PhantomJs\Http\RequestInterface
+     */
+    protected function createRequest($client, $method, $uri = '', array $parameters = [])
+    {
+        /**
+         * @see \JonnyW\PhantomJs\Http\Request
+         **/
+        $request = $client->getMessageFactory()->createRequest($uri, $method);
+        $request->addHeader(
+            'User-Agent',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0'
+        );
+
+        $request->addHeader(
+            'Content-Type',
+            'application/x-www-form-urlencoded'
+        );
+
+        if (isset($parameters['form_params'])) {
+            $request->setRequestData($parameters['form_params']);
+        }
+
+        return $request;
+    }
+
+    /**
      * @return PhantomJsBaseClient|null
      */
     protected function getPhantomJsClient()
@@ -81,6 +105,7 @@ class ClientBridge implements GuzzleClientInterface
             $this->phantomJsClient = PhantomJsBaseClient::getInstance();
             $this->phantomJsClient->getEngine()->setPath(PhantomBinary::getBin());
         }
+
         return $this->phantomJsClient;
     }
 }
