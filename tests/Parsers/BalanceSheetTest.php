@@ -14,10 +14,13 @@ use Symfony\Component\DomCrawler\Crawler;
  */
 class BalanceSheetTest extends AbstractTest
 {
-    public function testGenerateContentOng()
+    /**
+     * @dataProvider generateContentProvider
+     */
+    public function testGenerateContent($cif, $year)
     {
-        $parameters = $this->getBalanceSheetParameters('32586219', 'WEB_ONG_AN2014');
-        $parser     = $this->generateParser('32586219', 'WEB_ONG_AN2014');
+        $parameters = $this->getBalanceSheetParameters($cif, $year);
+        $parser     = $this->generateParser($cif, $year);
 
         self::assertEquals($parameters, $parser->getContent());
     }
@@ -30,6 +33,18 @@ class BalanceSheetTest extends AbstractTest
         $this->expectExceptionMessage('No balance sheet for selected year');
 
         $parser->getContent();
+    }
+
+    /**
+     * @return array
+     */
+    public function generateContentProvider()
+    {
+        return [
+//            ['32586219', 'WEB_ONG_AN2014'],
+            ['6453132', 'WEB_AN2012'],
+            ['6453132', 'WEB_UU_AN2016'],
+        ];
     }
 
     /**

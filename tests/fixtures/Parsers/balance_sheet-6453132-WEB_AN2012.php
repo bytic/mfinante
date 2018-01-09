@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'fixed_assets'       => '316774',
+    'current_assets'     => '127529',
+    'inventory'          => '-',
+    'receivables'        => '120555',
+    'cash_equivalents'   => '6974',
+    'prepayments'        => '1985228',
+    'liabilities'        => '2564937',
+    'income_advance'     => '-',
+    'provisions'         => '-',
+    'equity'             => '-160004',
+    'subscribed_capital' => '500',
+    'patrimony'          => '-',
+    'net_turnover'       => '108711',
+    'revenues_total'     => '146555',
+    'expenses_total'     => '183307',
+    'profit_gross'       => '0',
+    'loss_gross'         => '2054',
+    'profit_net'         => '0',
+    'loss_net'           => '6339',
+    'employees'          => '4',
+    'caen'               => 'Fabricarea painii, fabricarea prajiturilor si a produselor proaspete de patiserie',
+];
