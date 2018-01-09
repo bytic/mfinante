@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'fixed_assets' => '549252',
+    'current_assets' => '63517',
+    'inventory' => '-',
+    'receivables' => '56490',
+    'cash_equivalents' => '7027',
+    'prepayments' => '51031',
+    'liabilities' => '823804',
+    'income_advance' => '-',
+    'provisions' => '-',
+    'equity' => '-160004',
+    'subscribed_capital' => '500',
+    'patrimony' => '-',
+    'net_turnover' => '128108',
+    'revenues_total' => '142817',
+    'expenses_total' => '144871',
+    'result_gross_profit' => '0',
+    'result_gross_loss' => '2054',
+    'result_net_profit' => '0',
+    'result_net_loss' => '6339',
+    'employees' => '-',
+    'caen' => 'Inchirierea si subinchirierea bunurilor imobiliare proprii sau inchiriate',
+];

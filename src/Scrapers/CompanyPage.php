@@ -52,9 +52,14 @@ class CompanyPage extends AbstractScraper
         if (!Helper::validateCif($this->getCif())) {
             throw new InvalidCifException();
         }
+
+        /** IMPORTANT - the delay is necessary to make sure the javascript is all loaded */
+        $this->getClient()->getClient()->setConfig('request_delay', 12);
+
+
         $crawler = $this->getClient()->request(
             'GET',
-            'http://www.mfinante.gov.ro/infocodfiscal.html?cod=' . $this->getCif()
+            'http://www.mfinante.ro/infocodfiscal.html?cod=' . $this->getCif()
         );
         return $crawler;
     }

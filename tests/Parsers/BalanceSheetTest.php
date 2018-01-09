@@ -2,39 +2,113 @@
 
 namespace ByTIC\MFinante\Tests\Parsers;
 
+use ByTIC\MFinante\Exception\InvalidArgumentException;
 use ByTIC\MFinante\Parsers\BalanceSheetPage as BalanceSheetParser;
 use ByTIC\MFinante\Scrapers\BalanceSheetPage as BalanceSheetScraper;
-use PHPUnit\Framework\TestCase;
+use ByTIC\MFinante\Tests\AbstractTest;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Class BalanceSheetTest
  * @package ByTIC\MFinante\Tests\Parsers
  */
-class BalanceSheetTest extends TestCase
+class BalanceSheetTest extends AbstractTest
 {
-    public function testGenerateContent()
+    /**
+     * @dataProvider generateContentProvider
+     */
+    public function testGenerateContent($cif, $year)
     {
-        $pathDir = TEST_FIXTURE_PATH . DIRECTORY_SEPARATOR . 'Parsers' . DIRECTORY_SEPARATOR;
-        $html = file_get_contents(
-            $pathDir . 'balance_sheet-32586219.html'
-        );
+        $parameters = $this->getBalanceSheetParameters($cif, $year);
+        $parser     = $this->generateParser($cif, $year);
 
-        $parameters = require $pathDir . 'balance_sheet-32586219.php';
+        self::assertEquals($parameters, $parser->getContent());
+    }
 
-        $scrapper = new BalanceSheetScraper('32586219', 2014);
+    public function testGenerateContentNoBalance()
+    {
+        $parser = $this->generateParser('6453132', 'WEB_ONG_AN2011');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('No balance sheet for selected year');
+
+        $parser->getContent();
+    }
+
+    /**
+     * @return array
+     */
+    public function generateContentProvider()
+    {
+        return [
+//            ['32586219', 'WEB_ONG_AN2014'],
+            ['6453132', 'WEB_AN2012'],
+            ['6453132', 'WEB_UU_AN2016'],
+        ];
+    }
+
+    /**
+     * @param $cif
+     * @param $year
+     *
+     * @return BalanceSheetParser
+     */
+    protected function generateParser($cif, $year)
+    {
+        $yearInteger = substr($year, -4);
+
+        $parser = new BalanceSheetParser();
+        $parser->setScraper(new BalanceSheetScraper($cif, $yearInteger));
+        $parser->setCrawler($this->generateCrawler($cif, $year));
+
+        return $parser;
+    }
+
+    /**
+     * @param string $cif
+     * @param string $year
+     *
+     * @return Crawler
+     */
+    protected function generateCrawler($cif, $year)
+    {
+        $html = $this->getBalanceSheetHtml($cif, $year);
 
         $crawler = new Crawler(
             null,
-            'http://www.mfinante.gov.ro/infocodfiscal.html?an=WEB_ONG_AN2014&cod=32586219&captcha=null'
+            'http://www.mfinante.gov.ro/infocodfiscal.html?an=' . $year . '&cod=' . $year . '&captcha=null'
             . '&method.bilant=VIZUALIZARE'
         );
         $crawler->addContent($html, 'text/html;charset=utf-8');
 
-        $parser = new BalanceSheetParser();
-        $parser->setScraper($scrapper);
-        $parser->setCrawler($crawler);
+        return $crawler;
+    }
 
-        self::assertEquals($parameters, $parser->getContent());
+    /**
+     * @param $cui
+     * @param $year
+     *
+     * @return bool|string
+     */
+    protected function getBalanceSheetHtml($cui, $year)
+    {
+        $path = DIRECTORY_SEPARATOR . 'Parsers'
+                . DIRECTORY_SEPARATOR . 'balance_sheet-' . $cui . '-' . $year . '.html';
+
+        return $this->getFixtureHtml($path);
+    }
+
+    /**
+     * @param $cui
+     * @param $year
+     *
+     * @return bool|string
+     */
+    protected function getBalanceSheetParameters($cui, $year)
+    {
+        $path = DIRECTORY_SEPARATOR . 'Parsers'
+                . DIRECTORY_SEPARATOR . 'balance_sheet-' . $cui . '-' . $year . '.php';
+
+        return $this->getFixtureParameters($path);
     }
 }

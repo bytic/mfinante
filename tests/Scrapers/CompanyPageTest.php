@@ -19,7 +19,7 @@ class CompanyPageTest extends TestCase
 
         static::assertInstanceOf(Crawler::class, $crawler);
 
-        static::assertSame('http://www.mfinante.gov.ro/infocodfiscal.html?cod=32586219', $crawler->getUri());
+        static::assertSame('http://www.mfinante.ro/infocodfiscal.html?cod=32586219', $crawler->getUri());
 
         static::assertContains('32586219', $crawler->html());
     }
