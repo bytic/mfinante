@@ -13,6 +13,11 @@
       "ByTIC\\MFinante\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "ByTIC\\MFinante\\Tests\\": "tests/"
+    }
+  },
   "require": {
     "php": "^7.0",
     "bytic/goutte-phantomjs-bridge": "^1.0"

@@ -6,6 +6,7 @@ use ByTIC\MFinante\Exception\InvalidArgumentException;
 use ByTIC\MFinante\Exception\InvalidCifException;
 use ByTIC\MFinante\Helper;
 use ByTIC\MFinante\Parsers\BalanceSheetPage as Parser;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Class BalanceSheetPage
@@ -42,7 +43,7 @@ class BalanceSheetPage extends AbstractScraper
      */
     protected function generateCrawler()
     {
-        if (!Helper::validateCif($this->getCif())) {
+        if ( ! Helper::validateCif($this->getCif())) {
             throw new InvalidCifException();
         }
         $year = intval($this->getYear());
@@ -52,8 +53,11 @@ class BalanceSheetPage extends AbstractScraper
             );
         }
 
+        /** IMPORTANT - the delay is necessary to make sure the javascript is all loaded */
+        $this->getClient()->getClient()->setConfig('request_delay', 12);
+
         $params = [
-            'an'            => 'WEB_ONG_AN' . $year,
+            'an'            => $this->getYearValue(),
             'cod'           => $this->getCif(),
             'captcha'       => 'null',
             'method.bilant' => 'VIZUALIZARE'
@@ -64,7 +68,48 @@ class BalanceSheetPage extends AbstractScraper
             'http://www.mfinante.ro/infocodfiscal.html?' . http_build_query($params)
         );
 
+        file_put_contents(
+            __DIR__ . '/../../tests/fixtures/Parsers/balance_sheet-6453132-' . $this->getYearValue() . '.html',
+            $crawler->html()
+        );
+
         return $crawler;
+    }
+
+    /**
+     * @return string
+     * @throws InvalidArgumentException
+     */
+    protected function getYearValue()
+    {
+        $crawler = $this->getClient()->request(
+            'GET',
+            'http://www.mfinante.ro/infocodfiscal.html?cod=' . $this->getCif()
+        );
+
+        return $this->parseYearValueFromCrawler($crawler);
+    }
+
+    /**
+     * @param Crawler $crawler
+     *
+     * @return string
+     * @throws InvalidArgumentException
+     */
+    protected function parseYearValueFromCrawler($crawler)
+    {
+        $anFieldValues = $crawler->filter('form[name="codfiscalForm"] select')->children()
+                                 ->extract(['_text', 'value']);
+
+        foreach ($anFieldValues as $anFieldValue) {
+            if ($anFieldValue[0] == $this->getYear()) {
+                return $anFieldValue[1];
+            }
+        }
+
+        throw new InvalidArgumentException(
+            'Year [' . $this->getYear() . '] is invalid'
+        );
     }
 
     /**

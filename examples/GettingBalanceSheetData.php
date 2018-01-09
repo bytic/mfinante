@@ -4,8 +4,8 @@ require '../vendor/autoload.php';
 
 use ByTIC\MFinante\MFinante;
 
-$companyCif = 32586219;
-$year       = 2016;
+$companyCif = 6453132;
+$year       = 2012;
 
 $balanceSheetData = MFinante::balanceSheet($companyCif, $year);
 
