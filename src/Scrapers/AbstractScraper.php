@@ -2,7 +2,8 @@
 
 namespace ByTIC\MFinante\Scrapers;
 
-use ByTIC\MFinante\Clients\ClientFactory;
+use ByTIC\GouttePhantomJs\Clients\ClientFactory;
+use ByTIC\GouttePhantomJs\Clients\PhantomJs\ClientBridge;
 use ByTIC\MFinante\Parsers\AbstractParser;
 use Goutte\Client;
 use Symfony\Component\DomCrawler\Crawler;
@@ -59,7 +60,7 @@ abstract class AbstractScraper
     abstract protected function generateCrawler();
 
     /**
-     * @return Client
+     * @return Client|ClientBridge
      */
     public function getClient()
     {
