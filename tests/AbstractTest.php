@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
  * Class AbstractTest
  * @package ByTIC\MFinante\Tests
  */
-class AbstractTest extends TestCase
+abstract class AbstractTest extends TestCase
 {
 
     /**

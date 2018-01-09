@@ -5,9 +5,10 @@ namespace ByTIC\MFinante\Parsers;
 use ByTIC\MFinante\Exception\InvalidArgumentException;
 use ByTIC\MFinante\Models\BalanceSheet;
 use ByTIC\MFinante\Parsers\BalanceSheet\LabelMaps;
+use ByTIC\MFinante\Parsers\BalanceSheet\Labels\IndicatorLabels;
+use ByTIC\MFinante\Parsers\BalanceSheet\RowClassifier;
+use ByTIC\MFinante\Parsers\BalanceSheet\Rows\Indicator;
 use ByTIC\MFinante\Scrapers\BalanceSheetPage as Scraper;
-use DOMComment;
-use DOMElement;
 
 /**
  * Class BalanceSheetPage
@@ -58,63 +59,14 @@ class BalanceSheetPage extends AbstractParser
         $table  = $this->getCrawler()->filter('#main > center > table > tbody')->first();
         $rows   = $table->children();
         $return = [];
+        $rowClassifier = new RowClassifier();
         foreach ($rows as $row) {
-            if ($this->isValidTableRow($row)) {
-                $rowParsed = $this->parseTableRow($row);
-                if ($rowParsed) {
-                    $return[$rowParsed[0]] = $rowParsed[1];
-                }
+            $rowResult = $rowClassifier->determine($row);
+            if ($rowResult instanceof Indicator) {
+                $return[$rowResult->getName()] = $rowResult->getValue();
             }
         }
 
         return $return;
-    }
-
-    /**
-     * @param DOMElement $row
-     *
-     * @return boolean
-     */
-    protected function isValidTableRow($row)
-    {
-        if ($row->childNodes[0] instanceof DOMComment) {
-            return false;
-        }
-
-        if ($row->childNodes->length != 4) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param DOMElement $row
-     *
-     * @return array
-     */
-    protected function parseTableRow($row)
-    {
-        $label = $row->childNodes[0]->nodeValue;
-        $label = str_replace(':', '', $label);
-        $label = str_replace('(*)', '', $label);
-        $label = str_replace('(**)', '', $label);
-        $label = str_replace("\n", ' ', $label);
-        $label = str_replace("\t", ' ', $label);
-        $label = preg_replace('/\s+/', ' ', $label);
-        $label = trim($label);
-
-        $value = str_replace("\n", ' ', $row->childNodes[2]->nodeValue);
-        $value = preg_replace('/\s+/', ' ', $value);
-        $value = trim($value);
-
-        $labels = (new LabelMaps($this->getScraper()->getYear()))->getLabels();
-
-        $labelFind = isset($labels[$label]) ? $labels[$label] : null;
-        if ($labelFind) {
-            return [$labelFind, $value];
-        }
-
-        return [];
     }
 }
