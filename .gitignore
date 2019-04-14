@@ -2,3 +2,4 @@ vendor/
 bin/
 .idea/dictionaries/
 .idea/workspace.xml
+composer.lock
