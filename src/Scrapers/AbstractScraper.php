@@ -15,6 +15,8 @@ use Symfony\Component\DomCrawler\Crawler;
 abstract class AbstractScraper
 {
 
+    protected static $domain = 'https://www.mfinante.gov.ro';
+
     /**
      * @var Crawler
      */

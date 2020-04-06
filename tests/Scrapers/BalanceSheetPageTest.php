@@ -20,7 +20,7 @@ class BalanceSheetPageTest extends TestCase
         static::assertInstanceOf(Crawler::class, $crawler);
 
         static::assertSame(
-            'http://www.mfinante.ro/infocodfiscal.html?an=WEB_ONG_AN2014&cod=32586219'
+            'https://www.mfinante.gov.ro/infocodfiscal.html?an=WEB_ONG_AN2014&cod=32586219'
             . '&captcha=null&method.bilant=VIZUALIZARE',
             $crawler->getUri()
         );

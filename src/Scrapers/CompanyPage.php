@@ -56,10 +56,15 @@ class CompanyPage extends AbstractScraper
         /** IMPORTANT - the delay is necessary to make sure the javascript is all loaded */
         $this->getClient()->getClient()->setConfig('request_delay', 12);
 
-
         $crawler = $this->getClient()->request(
-            'GET',
-            'http://www.mfinante.ro/infocodfiscal.html?cod=' . $this->getCif()
+            'POST',
+            static::$domain . '/infocodfiscal.html',
+            [
+                'pagina' => 'domenii',
+                'cod' => $this->getCif(),
+                'captcha' => 'null',
+                'B1' => 'VIZUALIZARE'
+            ]
         );
         return $crawler;
     }
