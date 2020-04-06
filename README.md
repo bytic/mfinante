@@ -13,6 +13,10 @@ Php Scrapper for mfinante.ro website
 [![StyleCI](https://styleci.io/repos/97980380/shield?branch=master)](https://styleci.io/repos/97980380)
 [![Total Downloads](https://img.shields.io/packagist/dt/bytic/mfinante.svg?style=flat-square)](https://packagist.org/packages/bytic/mfinante)
 
+##### DEPRECATED
+Unfornantly at this moment the mfinance website has a captcha so scraping doest not seem possible.
+We recommend looking at openapi.ro
+-------------
 
 * [Installation](https://github.com/ByTIC/mfinante/wiki/Installation)
 * [Usage example](https://github.com/ByTIC/mfinante/wiki/Usage-example)

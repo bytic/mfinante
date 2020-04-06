@@ -53,20 +53,19 @@ class BalanceSheetPage extends AbstractScraper
             );
         }
 
-        /** IMPORTANT - the delay is necessary to make sure the javascript is all loaded */
-        $this->getClient()->getClient()->setConfig('request_delay', 12);
-
         $params = [
-            'an'            => $this->getYearValue(),
-            'cod'           => $this->getCif(),
-            'captcha'       => 'null',
+            'an' => $this->getYearValue(),
+            'cod' => $this->getCif(),
+            'captcha' => 'null',
             'method.bilant' => 'VIZUALIZARE'
         ];
 
-        $crawler = $this->getClient()->request(
-            'GET',
-            'http://www.mfinante.ro/infocodfiscal.html?' . http_build_query($params)
-        );
+        $uri = static::$domain . '/infocodfiscal.html?' . http_build_query($params);
+
+        /** IMPORTANT - the delay is necessary to make sure the javascript is all loaded */
+        $this->getClient()->getClient()->setConfig('request_delay', 12);
+
+        $crawler = $this->getClient()->request('GET', $uri);
 
         file_put_contents(
             __DIR__ . '/../../tests/fixtures/Parsers/balance_sheet-6453132-' . $this->getYearValue() . '.html',
@@ -84,7 +83,7 @@ class BalanceSheetPage extends AbstractScraper
     {
         $crawler = $this->getClient()->request(
             'GET',
-            'http://www.mfinante.ro/infocodfiscal.html?cod=' . $this->getCif()
+            static::$domain . '/infocodfiscal.html?cod=' . $this->getCif()
         );
 
         return $this->parseYearValueFromCrawler($crawler);

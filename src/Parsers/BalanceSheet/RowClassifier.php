@@ -52,9 +52,12 @@ class RowClassifier
             return false;
         }
 
-        $label = $this->prepareLabel(
-            $this->getDomElement()->childNodes->item(0)->nodeValue
-        );
+        $labelValue = trim($this->getDomElement()->childNodes->item(0)->nodeValue);
+        if (empty($labelValue)) {
+            $labelValue = $this->getDomElement()->childNodes->item(1)->nodeValue;
+        }
+
+        $label = $this->prepareLabel($labelValue);
 
         $lookUp = LabelMap::lookup($label);
 
@@ -76,7 +79,7 @@ class RowClassifier
             return false;
         }
 
-        if ($row->childNodes->length != 4) {
+        if ($row->childNodes->length < 4) {
             return false;
         }
 
@@ -167,9 +170,12 @@ class RowClassifier
             )
         );
 
-        $value = $this->prepareValue(
-            $this->getDomElement()->childNodes->item(2)->nodeValue
-        );
+        $rawValue = trim($this->getDomElement()->childNodes->item(2)->nodeValue);
+        if (empty($rawValue)) {
+            $rawValue = $this->getDomElement()->childNodes->item(3)->nodeValue;
+        }
+
+        $value = $this->prepareValue($rawValue);
         $indicator->setValue($value);
         return $indicator;
     }
