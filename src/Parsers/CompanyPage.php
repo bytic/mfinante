@@ -3,6 +3,7 @@
 namespace ByTIC\MFinante\Parsers;
 
 use ByTIC\MFinante\Models\Company;
+use ByTIC\MFinante\Session\CaptchaDetector;
 use DOMElement;
 
 /**
@@ -17,9 +18,13 @@ class CompanyPage extends AbstractParser
      */
     protected function generateContent()
     {
-        $return                   = [];
-        $return['cif']            = $this->parseCif();
-        $return                   = array_merge($return, $this->parseTable());
+        if (CaptchaDetector::isCaptcha($this->getCrawler())) {
+            return CaptchaDetector::response();
+        }
+
+        $return = [];
+        $return['cif'] = $this->parseCif();
+        $return = array_merge($return, $this->parseTable());
         $return['balance_sheets'] = $this->parseBalanceSheetsYears();
 
         return $return;
@@ -68,7 +73,13 @@ class CompanyPage extends AbstractParser
      */
     protected function parseTableRow($row)
     {
-        $label = $row->childNodes[0]->nodeValue;
+        $start = 1;
+        $labelElement = $row->childNodes[$start];
+        if ($labelElement instanceof \DOMText) {
+            $start++;
+            $labelElement = $row->childNodes[$start];
+        }
+        $label = $labelElement->nodeValue;
         $label = str_replace(':', '', $label);
         $label = str_replace('(*)', '', $label);
         $label = str_replace('(**)', '', $label);
@@ -77,7 +88,9 @@ class CompanyPage extends AbstractParser
         $label = preg_replace('/\s+/', ' ', $label);
         $label = trim($label);
 
-        $value = str_replace("\n", ' ', $row->childNodes[2]->nodeValue);
+        $valueElement = $row->childNodes[$start + 2];
+        $value = $valueElement->nodeValue;
+        $value = str_replace("\n", ' ', $value);
         $value = preg_replace('/\s+/', ' ', $value);
         $value = trim($value);
 

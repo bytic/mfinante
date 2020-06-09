@@ -21,7 +21,7 @@
   "require": {
     "php": "^7.0",
     "ext-dom": "*",
-    "bytic/goutte-phantomjs-bridge": "^1.0"
+    "bytic/goutte-phantomjs-bridge": "^1.0.7"
   },
   "require-dev": {
     "phpunit/phpunit": "^7.2|^8.0|^9.0",

@@ -2,10 +2,7 @@
 
 namespace ByTIC\MFinante\Scrapers;
 
-use ByTIC\GouttePhantomJs\Clients\ClientFactory;
-use ByTIC\GouttePhantomJs\Clients\PhantomJs\ClientBridge;
 use ByTIC\MFinante\Parsers\AbstractParser;
-use Goutte\Client;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
@@ -14,6 +11,8 @@ use Symfony\Component\DomCrawler\Crawler;
  */
 abstract class AbstractScraper
 {
+    use Traits\HasClient;
+    use Traits\HasParams;
 
     protected static $domain = 'https://www.mfinante.gov.ro';
 
@@ -21,11 +20,6 @@ abstract class AbstractScraper
      * @var Crawler
      */
     protected $crawler = null;
-
-    /**
-     * @var Client
-     */
-    protected $client = null;
 
     /**
      * @return AbstractParser
@@ -60,40 +54,6 @@ abstract class AbstractScraper
      * @return Crawler
      */
     abstract protected function generateCrawler();
-
-    /**
-     * @return Client|ClientBridge
-     */
-    public function getClient()
-    {
-        if ($this->client == null) {
-            $this->initClient();
-        }
-
-        return $this->client;
-    }
-
-    protected function initClient()
-    {
-        $client = $this->generateClient();
-        $this->setClient($client);
-    }
-
-    /**
-     * @param Client $client
-     */
-    public function setClient($client)
-    {
-        $this->client = $client;
-    }
-
-    /**
-     * @return Client
-     */
-    protected function generateClient()
-    {
-        return ClientFactory::getPhantomJsClient();
-    }
 
     /**
      * @return AbstractParser

@@ -15,20 +15,36 @@ class MFinante
 {
     /**
      * @param $cif
+     * @param array $params
      * @return CompanyPageParser
      */
-    public static function cif($cif)
+    public static function cif($cif, $params = [])
     {
-        return (new CompanyPageScraper($cif))->execute();
+        $scraper = new CompanyPageScraper($cif);
+        $scraper->setParams($params);
+        return static::executeScraper($scraper);
     }
 
     /**
      * @param int $cif
      * @param int $year
+     * @param array $params
      * @return BalanceSheetPageParser
      */
-    public static function balanceSheet($cif, $year)
+    public static function balanceSheet($cif, $year, $params = [])
     {
-        return (new BalanceSheetPageScraper($cif, $year))->execute();
+        $scraper = new BalanceSheetPageScraper($cif, $year);
+        $scraper->setParams($params);
+        return static::executeScraper($scraper);
     }
+
+    /**
+     * @param $scraper
+     * @return mixed
+     */
+    protected static function executeScraper($scraper)
+    {
+        return $scraper->execute();
+    }
+
 }

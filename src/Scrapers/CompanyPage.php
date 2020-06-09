@@ -2,9 +2,11 @@
 
 namespace ByTIC\MFinante\Scrapers;
 
+use ByTIC\GouttePhantomJs\Clients\ClientFactory;
 use ByTIC\MFinante\Exception\InvalidCifException;
 use ByTIC\MFinante\Helper;
 use ByTIC\MFinante\Parsers\CompanyPage as Parser;
+use ByTIC\MFinante\Session\CaptchaDetector;
 
 /**
  * Class CompanyPage
@@ -54,7 +56,11 @@ class CompanyPage extends AbstractScraper
         }
 
         /** IMPORTANT - the delay is necessary to make sure the javascript is all loaded */
-        $this->getClient()->getClient()->setConfig('request_delay', 12);
+        ClientFactory::getPhantomJsClientBridge()->setConfig('request_delay', 12);
+        $config = CaptchaDetector::phantomJsParams();
+        foreach ($config as $name => $value) {
+            ClientFactory::getPhantomJsClientBridge()->setConfig($name, $value);
+        }
 
         $crawler = $this->getClient()->request(
             'POST',
@@ -62,7 +68,7 @@ class CompanyPage extends AbstractScraper
             [
                 'pagina' => 'domenii',
                 'cod' => $this->getCif(),
-                'captcha' => 'null',
+                'captcha' => $this->getParam('captcha', 'null'),
                 'B1' => 'VIZUALIZARE'
             ]
         );
