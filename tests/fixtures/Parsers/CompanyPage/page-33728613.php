@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'cif' => '33728613',
+    'name' => 'FUNDATIA HOSPICE CASA SPERANTEI',
+    'address' => 'Str. Tămâioarei   121-123               -   Bucuresti   sect 2',
+    'county' => 'MUNICIPIUL BUCUREŞTI',
+    'trade_register_code' => '- /- /-',
+    'authorization_code' => 'CTR V/C DIN 17.5.2011',
+    'postal_code' => '-',
+    'phone' => '0723547495',
+    'fax' => '-',
+    'state' => 'INREGISTRAT din data 24 Octombrie 2014',
+    'observations' => '-',
+    'date_last_statement' => '24 Octombrie 2014',
+    'date_last_processing' => '24 Octombrie 2014',
+    'tax_profit' => 'NU',
+    'tax_income' => 'NU',
+    'tax_excise' => 'NU',
+    'tax_vat' => 'NU',
+    'tax_oil_gas' => 'NU',
+    'tax_buildings' => '-',
+    'tax_salaries' => 'NU',
+    'tax_mining' => 'NU',
+    'tax_oil' => 'NU',
+    'tax_gambling' => 'NU',
+    'balance_sheets' => [],
+];

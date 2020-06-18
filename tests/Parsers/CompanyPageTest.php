@@ -13,17 +13,22 @@ use Symfony\Component\DomCrawler\Crawler;
  */
 class CompanyPageTest extends TestCase
 {
-    public function testGenerateContent()
+    /**
+     * @dataProvider data_generateContent
+     * @param $cui
+     */
+    public function test_generateContent($cui)
     {
+        $directory = TEST_FIXTURE_PATH . DIRECTORY_SEPARATOR . 'Parsers' . DIRECTORY_SEPARATOR . 'CompanyPage' . DIRECTORY_SEPARATOR;
         $html = file_get_contents(
-            TEST_FIXTURE_PATH . DIRECTORY_SEPARATOR . 'Parsers' . DIRECTORY_SEPARATOR . 'page-32586219.html'
+            $directory . 'page-'.$cui.'.html'
         );
 
-        $parameters = require TEST_FIXTURE_PATH . DIRECTORY_SEPARATOR . 'Parsers' . DIRECTORY_SEPARATOR . 'page-32586219.php';
+        $parameters = require $directory . 'page-'.$cui.'.php';
 
-        $scrapper = new CompanyPageScraper('32586219');
+        $scrapper = new CompanyPageScraper($cui);
 
-        $crawler = new Crawler(null, 'http://www.mfinante.gov.ro/infocodfiscal.html?cod=32586219');
+        $crawler = new Crawler(null, 'http://www.mfinante.gov.ro/infocodfiscal.html?cod='.$cui);
         $crawler->addContent($html, 'text/html;charset=utf-8');
 
         $parser = new CompanyPageParser();
@@ -31,5 +36,16 @@ class CompanyPageTest extends TestCase
         $parser->setCrawler($crawler);
 
         self::assertEquals($parameters, $parser->getContent());
+    }
+
+    /**
+     * @return []
+     */
+    public function data_generateContent()
+    {
+        return [
+            ['32586219'],
+            ['33728613'],
+        ];
     }
 }

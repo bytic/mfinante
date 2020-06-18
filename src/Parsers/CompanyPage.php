@@ -5,6 +5,7 @@ namespace ByTIC\MFinante\Parsers;
 use ByTIC\MFinante\Models\Company;
 use ByTIC\MFinante\Session\CaptchaDetector;
 use DOMElement;
+use Symfony\Component\DomCrawler\Crawler;
 
 /**
  * Class CompanyPage
@@ -109,7 +110,12 @@ class CompanyPage extends AbstractParser
      */
     protected function parseBalanceSheetsYears()
     {
-        $select  = $this->getCrawler()->filter('form[name="codfiscalForm"] > select')->first();
+        /** @var Crawler $select */
+        $select  = $this->getCrawler()->filter('form[name="codfiscalForm"] > select');
+        if ($select->count() < 1) {
+            return [];
+        }
+        $select  = $select->first();
         $options = $select->children();
         $sheets  = [];
         foreach ($options as $option) {
