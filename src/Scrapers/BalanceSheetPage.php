@@ -2,10 +2,12 @@
 
 namespace ByTIC\MFinante\Scrapers;
 
+use ByTIC\GouttePhantomJs\Clients\ClientFactory;
 use ByTIC\MFinante\Exception\InvalidArgumentException;
 use ByTIC\MFinante\Exception\InvalidCifException;
 use ByTIC\MFinante\Helper;
 use ByTIC\MFinante\Parsers\BalanceSheetPage as Parser;
+use ByTIC\MFinante\Session\CaptchaDetector;
 use Symfony\Component\DomCrawler\Crawler;
 
 /**
@@ -53,6 +55,13 @@ class BalanceSheetPage extends AbstractScraper
             );
         }
 
+        /** IMPORTANT - the delay is necessary to make sure the javascript is all loaded */
+        ClientFactory::getPhantomJsClientBridge()->setConfig('request_delay', 12);
+        $config = CaptchaDetector::phantomJsParams();
+        foreach ($config as $name => $value) {
+            ClientFactory::getPhantomJsClientBridge()->setConfig($name, $value);
+        }
+
         $params = [
             'an' => $this->getYearValue(),
             'cod' => $this->getCif(),
@@ -62,15 +71,12 @@ class BalanceSheetPage extends AbstractScraper
 
         $uri = static::$domain . '/infocodfiscal.html?' . http_build_query($params);
 
-        /** IMPORTANT - the delay is necessary to make sure the javascript is all loaded */
-        $this->getClient()->getClient()->setConfig('request_delay', 12);
-
         $crawler = $this->getClient()->request('GET', $uri);
 
-        file_put_contents(
-            __DIR__ . '/../../tests/fixtures/Parsers/balance_sheet-6453132-' . $this->getYearValue() . '.html',
-            $crawler->html()
-        );
+//        file_put_contents(
+//            __DIR__ . '/../../tests/fixtures/Parsers/balance_sheet-6453132-' . $this->getYearValue() . '.html',
+//            $crawler->html()
+//        );
 
         return $crawler;
     }
